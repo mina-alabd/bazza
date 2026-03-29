@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Bazza | Driver Information Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Tahoma', system-ui, -apple-system, 'BlinkMacSystemFont', sans-serif;
+            background: linear-gradient(145deg, #0b2b26 0%, #1a4a3f 100%);
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        /* RTL support for Arabic mode */
+        body.arabic-mode {
+            direction: rtl;
+            text-align: right;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 32px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(0px);
+        }
+
+        .header {
+            background: linear-gradient(115deg, #0f3b33 0%, #1f6e5c 100%);
+            color: white;
+            padding: 28px 32px;
+            text-align: center;
+            position: relative;
+        }
+
+        .lang-toggle-wrapper {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+        }
+        body.arabic-mode .lang-toggle-wrapper {
+            right: auto;
+            left: 32px;
+        }
+
+        .lang-btn {
+            background: rgba(255,255,245,0.2);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,245,200,0.5);
+            padding: 8px 24px;
+            border-radius: 60px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #fef9e6;
+            font-size: 14px;
+            letter-spacing: 0.4px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .lang-btn:hover {
+            background: rgba(255,255,245,0.35);
+            transform: scale(1.02);
+            border-color: #ffecb3;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+            font-weight: 400;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        .search-area {
+            padding: 28px 32px;
+            background: #ffffff;
+            border-bottom: 1px solid #e9edf2;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 48px;
+            font-size: 16px;
+            transition: all 0.25s;
+            font-family: inherit;
+            background: #fefefe;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1f6e5c;
+            box-shadow: 0 0 0 3px rgba(31, 110, 92, 0.2);
+        }
+
+        button {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 48px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-weight: 600;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #1f6e5c;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary:hover {
+            background: #0f5a49;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(31,110,92,0.25);
+        }
+
+        .btn-danger {
+            background: #e26d5c;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+
+        .btn-danger:hover {
+            background: #c55545;
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            background: #f1f5f9;
+            padding: 14px 32px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #e2edf2;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3a38;
+        }
+
+        .stats span {
+            font-weight: 700;
+            color: #0f5a49;
+        }
+
+        .results {
+            padding: 28px 32px;
+            max-height: 580px;
+            overflow-y: auto;
+            background: #fdfdfd;
+        }
+
+        .result-card {
+            background: white;
+            border: 1px solid #eef2f6;
+            border-radius: 24px;
+            padding: 20px 24px;
+            margin-bottom: 18px;
+            transition: all 0.25s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+
+        .result-card:hover {
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.07);
+            transform: translateY(-3px);
+            border-color: #cbdde0;
+        }
+
+        .result-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #1f6e5c;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2f0ed;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px;
+        }
+
+        .result-item {
+            display: flex;
+            padding: 8px 6px;
+            background: #fafcff;
+            border-radius: 16px;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 6px;
+            border-bottom: 1px dashed #e9edf2;
+        }
+
+        .result-label {
+            font-weight: 700;
+            color: #2c5a52;
+            min-width: 110px;
+            font-size: 0.88rem;
+        }
+
+        .result-value {
+            color: #1a2f2c;
+            word-break: break-word;
+            font-weight: 500;
+            background: #f7fbfa;
+            padding: 2px 8px;
+            border-radius: 24px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 48px 24px;
+        }
+
+        .spinner {
+            border: 3px solid #e2f0ed;
+            border-top: 3px solid #1f6e5c;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6d8a83;
+        }
+
+        .error {
+            background: #ffe6e2;
+            color: #c2412c;
+            padding: 18px;
+            border-radius: 28px;
+            margin: 20px;
+            text-align: center;
+            font-weight: 500;
+            border-left: 5px solid #e26d5c;
+        }
+
+        @media (max-width: 680px) {
+            .search-box {
+                flex-direction: column;
+            }
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            .lang-toggle-wrapper {
+                position: relative;
+                top: 0;
+                left: 0;
+                text-align: center;
+                margin-bottom: 16px;
+                display: flex;
+                justify-content: center;
+            }
+            .header {
+                padding-top: 20px;
+            }
+            .header p {
+                max-width: 100%;
+            }
+            body.arabic-mode .lang-toggle-wrapper {
+                left: auto;
+                right: auto;
+            }
+            .stats {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="appContainer">
+        <div class="header">
+            <div class="lang-toggle-wrapper">
+                <button id="langSwitchBtn" class="lang-btn">🇸🇦 العربية</button>
+            </div>
+            <h1 id="mainTitle">Bazza</h1>
+            <p id="subTitle">Enter your phone number to view your information. Please note that the information displayed is from the previous day.</p>
+        </div>
+
+        <div class="search-area">
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" 
+                       placeholder="Enter phone number to search...">
+                <button id="searchBtn" class="btn-primary">🔍 Search by phone number</button>
+                <button id="clearBtn" class="btn-danger">🗑️ Clear</button>
+            </div>
+            <div id="infoHint" style="font-size: 12px; color: #6f8f87; text-align: center;">
+                💡 You can search by exact ID or browse all entries.
+            </div>
+        </div>
+
+        <div class="stats" id="stats" style="display: none;">
+            <div id="statsCountText">📈 Results count: <strong id="resultCount">0</strong></div>
+        </div>
+
+        <div class="results" id="results">
+            <div class="empty-state" id="emptyStateMsg">
+                <div style="font-size: 52px; margin-bottom: 16px;">📱</div>
+                <h3 id="welcomeTitle">Welcome to Search System</h3>
+                <p id="welcomeDesc">Enter an phone number or use the search button</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ======================== GOOGLE SHEETS API ENDPOINT ========================
+        const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbypLFq6aSnAxaFEkK3jqdjS43k7dGtLskgwKWEv5i2MJPsjlwKBBKIqMod3Y4cysc0O/exec'; 
+        
+        // ------------------------ BILINGUAL DICTIONARY (ENHANCED) ----------------------------
+        let currentLang = 'en';   // default english
+        
+        const translations = {
+            en: {
+                mainTitle: "Bazza",
+                subTitle: "Enter your phone number to view your information. Please note that the information displayed is from the previous day.",
+                searchPlaceholder: "Enter phone number to search...",
+                searchBtnText: "🔍 Search by phone number",
+                clearBtnText: "🗑️ Clear",
+                infoHint: "💡 You can search by exact ID or browse all entries.",
+                statsCount: "📈 Results count:",
+                welcomeTitle: "Welcome to Search System",
+                welcomeDesc: "Enter a phone number or use the search button",
+                loadingMsg: "Loading driver data...",
+                noResultsTitle: "No results found",
+                noResultsDesc: "No matching data found for your search.",
+                clearStateTitle: "Search Cleared",
+                clearStateDesc: "You can start a new search.",
+                errorPrefix: "⚠️ ",
+                fetchError: "Failed to connect to API: ",
+                emptyIdError: "Please enter a phone number to search",
+                resultLabel: "Driver Record",
+                fieldNames: {
+                    'id': '📞 Phone Number',
+                    'معرّف السائق': '🆔 Driver ID',
+                    'اسم السائق': '👤 First Name',
+                    'الاسم الاخير': 'Last Name',
+                    'أيام العمل': 'Work Days',
+                    'الأيام الصالحة': 'Valid Days',
+                    'الطلبات التي تم تسليمها': 'Orders Delivered',
+                    'الطلبات المُلغاة': 'Orders Canceled',
+                    'الطلبات المرفوضة': 'Orders Rejected',
+                    'ليفل': 'Level',
+                    'الطلبات المتأخرة': 'Overdue Orders',
+                    'الطلبات المتأخرة جدًا': 'Very Overdue Orders'
+                },
+                langSwitchTo: "🇸🇦 العربية"
+            },
+            ar: {
+                mainTitle: "Bazza",
+                subTitle: "اكتب رقم هاتفك لمعرفة المعلومات الخاصة بك برجاء العلم بان المعلومات المعرضة لليوم السابق",
+                searchPlaceholder: "أدخل رقم الهاتف للبحث...",
+                searchBtnText: "🔍 بحث برقم الهاتف",
+                clearBtnText: "🗑️ مسح",
+                infoHint: "💡 يمكنك البحث بالرقم الدقيق أو استعراض جميع الإدخالات.",
+                statsCount: "📈 عدد النتائج:",
+                welcomeTitle: "مرحباً بك في نظام البحث",
+                welcomeDesc: "أدخل رقم الهاتف أو اضغط على بحث",
+                loadingMsg: "جاري تحميل بيانات السائق...",
+                noResultsTitle: "لا توجد نتائج",
+                noResultsDesc: "لم يتم العثور على بيانات مطابقة للبحث",
+                clearStateTitle: "تم مسح البحث",
+                clearStateDesc: "يمكنك البدء ببحث جديد",
+                errorPrefix: "⚠️ ",
+                fetchError: "فشل الاتصال بـ API: ",
+                emptyIdError: "الرجاء إدخال رقم الهاتف للبحث",
+                resultLabel: "بيانات السائق",
+                fieldNames: {
+                    'id': '📞 رقم الهاتف',
+                    'معرّف السائق': '🆔 معرف السائق',
+                    'اسم السائق': '👤 الاسم الأول',
+                    'الاسم الاخير': 'اسم العائلة',
+                    'أيام العمل': 'أيام العمل',
+                    'الأيام الصالحة': 'الأيام الصالحة',
+                    'الطلبات التي تم تسليمها': 'الطلبات الموصلة',
+                    'الطلبات المُلغاة': 'الطلبات الملغاة',
+                    'الطلبات المرفوضة': 'الطلبات المرفوضة',
+                    'ليفل': 'المستوى',
+                    'الطلبات المتأخرة': 'طلبات متأخرة',
+                    'الطلبات المتأخرة جدًا': 'طلبات متأخرة جداً'
+                },
+                langSwitchTo: "English"
+            }
+        };
+
+        // Helper: apply language to UI
+        function applyLanguage() {
+            const t = translations[currentLang];
+            document.getElementById('mainTitle').innerText = t.mainTitle;
+            document.getElementById('subTitle').innerText = t.subTitle;
+            const searchInput = document.getElementById('searchInput');
+            searchInput.placeholder = t.searchPlaceholder;
+            document.getElementById('searchBtn').innerHTML = t.searchBtnText;
+            document.getElementById('clearBtn').innerHTML = t.clearBtnText;
+            document.getElementById('infoHint').innerHTML = t.infoHint;
+            
+            const resultCountSpan = document.getElementById('resultCount');
+            const currentCount = resultCountSpan ? resultCountSpan.innerText : '0';
+            document.getElementById('statsCountText').innerHTML = `${t.statsCount} <strong id="resultCount">${currentCount}</strong>`;
+            
+            const emptyDiv = document.getElementById('emptyStateMsg');
+            if (emptyDiv && emptyDiv.style.display !== 'none') {
+                document.getElementById('welcomeTitle').innerText = t.welcomeTitle;
+                document.getElementById('welcomeDesc').innerText = t.welcomeDesc;
+            }
+            
+            document.getElementById('langSwitchBtn').innerText = t.langSwitchTo;
+            
+            if (currentLang === 'ar') {
+                document.body.classList.add('arabic-mode');
+                document.body.style.direction = 'rtl';
+                document.body.style.textAlign = 'right';
+            } else {
+                document.body.classList.remove('arabic-mode');
+                document.body.style.direction = 'ltr';
+                document.body.style.textAlign = 'left';
+            }
+            
+            const statsDiv = document.getElementById('stats');
+            if (statsDiv.style.display === 'flex') {
+                const freshCount = document.getElementById('resultCount')?.innerText || '0';
+                document.getElementById('statsCountText').innerHTML = `${t.statsCount} <strong id="resultCount">${freshCount}</strong>`;
+            }
+        }
+        
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            applyLanguage();
+            const resultsContainer = document.getElementById('results');
+            const storedResp = resultsContainer.getAttribute('data-last-response');
+            if (storedResp && storedResp !== 'null' && storedResp !== '') {
+                try {
+                    const lastRespObj = JSON.parse(storedResp);
+                    displayResults(lastRespObj, '');
+                } catch(e) {}
+            } else {
+                const emptyMsgDiv = document.getElementById('emptyStateMsg');
+                if (emptyMsgDiv && emptyMsgDiv.style.display !== 'none') {
+                    const tCurr = translations[currentLang];
+                    document.getElementById('welcomeTitle').innerText = tCurr.welcomeTitle;
+                    document.getElementById('welcomeDesc').innerText = tCurr.welcomeDesc;
+                }
+            }
+        }
+        
+        function escapeHtml(text) {
+            if (!text && text !== 0) return '';
+            const str = String(text);
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+        
+        function getLocalizedFieldName(fieldKey) {
+            const dict = translations[currentLang].fieldNames;
+            // try direct match or normalized lowercase
+            if (dict[fieldKey]) return dict[fieldKey];
+            const lowerKey = fieldKey.toLowerCase();
+            for (let [key, value] of Object.entries(dict)) {
+                if (key.toLowerCase() === lowerKey) return value;
+            }
+            return fieldKey;
+        }
+        
+        function showError(message) {
+            const resultsDiv = document.getElementById('results');
+            const t = translations[currentLang];
+            resultsDiv.innerHTML = `<div class="error">${t.errorPrefix} ${escapeHtml(message)}</div>`;
+            document.getElementById('stats').style.display = 'none';
+            resultsDiv.removeAttribute('data-last-response');
+        }
+        
+        function displayResults(response, searchType = '') {
+            const resultsDiv = document.getElementById('results');
+            const statsDiv = document.getElementById('stats');
+            const t = translations[currentLang];
+            
+            if (!response || response.status !== 'success') {
+                const errMsg = response?.message || (currentLang === 'en' ? 'No data or invalid response' : 'لا توجد بيانات أو استجابة غير صالحة');
+                showError(errMsg);
+                return;
+            }
+            
+            const data = response.data;
+            const count = response.count || (data ? data.length : 0);
+            
+            if (!data || data.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 48px; margin-bottom: 15px;">🔍</div>
+                        <h3>${t.noResultsTitle}</h3>
+                        <p>${t.noResultsDesc}</p>
+                    </div>
+                `;
+                statsDiv.style.display = 'none';
+                resultsDiv.removeAttribute('data-last-response');
+                return;
+            }
+            
+            document.getElementById('resultCount').textContent = count;
+            document.getElementById('statsCountText').innerHTML = `${t.statsCount} <strong id="resultCount">${count}</strong>`;
+            statsDiv.style.display = 'flex';
+            
+            let html = '';
+            data.forEach((item, idx) => {
+                html += `<div class="result-card">
+                            <div class="result-title">📄 ${t.resultLabel} #${idx + 1}</div>
+                            <div class="result-grid">`;
+                
+                // Sort keys for consistency but display all relevant
+                const keys = Object.keys(item).filter(k => item[k] !== undefined && item[k] !== null && item[k].toString().trim() !== '');
+                keys.forEach(key => {
+                    const value = item[key];
+                    const localizedLabel = getLocalizedFieldName(key);
+                    html += `<div class="result-item">
+                                <div class="result-label">${escapeHtml(localizedLabel)}ㅤ:ㅤ</div>
+                                <div class="result-value">${escapeHtml(value.toString())}</div>
+                            </div>`;
+                });
+                html += `</div></div>`;
+            });
+            
+            resultsDiv.innerHTML = html;
+            resultsDiv.setAttribute('data-last-response', JSON.stringify(response));
+        }
+        
+        function showLoading() {
+            const resultsDiv = document.getElementById('results');
+            const t = translations[currentLang];
+            resultsDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>${t.loadingMsg}</p>
+                </div>
+            `;
+            document.getElementById('stats').style.display = 'none';
+            resultsDiv.removeAttribute('data-last-response');
+        }
+        
+        async function callAPI(endpoint, params = {}) {
+            showLoading();
+            try {
+                let url = `${API_BASE_URL}?endpoint=${endpoint}`;
+                Object.keys(params).forEach(key => {
+                    if (params[key] !== undefined && params[key] !== '') {
+                        url += `&${key}=${encodeURIComponent(params[key])}`;
+                    }
+                });
+                const response = await fetch(url, { method: 'GET', cache: 'no-store' });
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                const t = translations[currentLang];
+                showError(t.fetchError + error.message);
+                return null;
+            }
+        }
+        
+        async function searchById() {
+            const searchId = document.getElementById('searchInput').value.trim();
+            const t = translations[currentLang];
+            if (!searchId) {
+                showError(t.emptyIdError);
+                return;
+            }
+            const result = await callAPI('search', { id: searchId });
+            if (result) {
+                displayResults(result, 'id');
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('searchInput').value = '';
+            const resultsDiv = document.getElementById('results');
+            const statsDiv = document.getElementById('stats');
+            const t = translations[currentLang];
+            resultsDiv.innerHTML = `
+                <div class="empty-state" id="emptyStateMsg">
+                    <div style="font-size: 48px; margin-bottom: 15px;">🗑️</div>
+                    <h3 id="welcomeTitle">${t.clearStateTitle}</h3>
+                    <p id="welcomeDesc">${t.clearStateDesc}</p>
+                </div>
+            `;
+            statsDiv.style.display = 'none';
+            resultsDiv.removeAttribute('data-last-response');
+            // re-assign dynamic empty elements ids for language switch consistency
+            const newEmptyTitle = document.getElementById('welcomeTitle');
+            const newEmptyDesc = document.getElementById('welcomeDesc');
+            if (newEmptyTitle && newEmptyDesc) {
+                // keep ref
+            }
+        }
+        
+        // Ensure empty state after language switch reflects correct state when no data
+        function syncEmptyStateAfterLang() {
+            const resultsDiv = document.getElementById('results');
+            const statsDiv = document.getElementById('stats');
+            const hasLastResponse = resultsDiv.getAttribute('data-last-response');
+            const hasResultCards = resultsDiv.querySelectorAll('.result-card').length;
+            if (!hasLastResponse && !hasResultCards && statsDiv.style.display !== 'flex') {
+                const t = translations[currentLang];
+                resultsDiv.innerHTML = `
+                    <div class="empty-state" id="emptyStateMsg">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📱</div>
+                        <h3 id="welcomeTitle">${t.welcomeTitle}</h3>
+                        <p id="welcomeDesc">${t.welcomeDesc}</p>
+                    </div>
+                `;
+            } else if (hasResultCards === 0 && !hasLastResponse && statsDiv.style.display !== 'flex') {
+                const t = translations[currentLang];
+                resultsDiv.innerHTML = `
+                    <div class="empty-state" id="emptyStateMsg">
+                        <div style="font-size: 48px; margin-bottom: 15px;">🔍</div>
+                        <h3 id="welcomeTitle">${t.welcomeTitle}</h3>
+                        <p id="welcomeDesc">${t.welcomeDesc}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Event Listeners
+        document.getElementById('langSwitchBtn').addEventListener('click', () => {
+            toggleLanguage();
+            syncEmptyStateAfterLang();
+            const lastRespAttr = document.getElementById('results').getAttribute('data-last-response');
+            if (lastRespAttr && lastRespAttr !== 'null') {
+                try {
+                    const respObj = JSON.parse(lastRespAttr);
+                    displayResults(respObj, '');
+                } catch(e) {}
+            }
+        });
+        
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            searchById();
+        });
+        
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            clearResults();
+        });
+        
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchById();
+            }
+        });
+        
+        // Initialization: English default, apply texts, and clear any stray loading state
+        currentLang = 'en';
+        applyLanguage();
+        // Ensure empty state matches fresh start
+        const initResults = document.getElementById('results');
+        if (initResults.querySelector('.empty-state')) {
+            const t = translations.en;
+            document.getElementById('welcomeTitle').innerText = t.welcomeTitle;
+            document.getElementById('welcomeDesc').innerText = t.welcomeDesc;
+        }
+        // optional: reset stats visibility
+        document.getElementById('stats').style.display = 'none';
+        
+        // expose globals for inline onclick fallback (safety)
+        window.searchById = searchById;
+        window.clearResults = clearResults;
+    </script>
+</body>
+</html>
