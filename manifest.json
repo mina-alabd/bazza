@@ -1,0 +1,17 @@
+{
+  "short_name": "Bazza",
+  "name": "bazza",
+  "display": "standalone",
+  "id": "https://script.google.com/macros/s/AKfycbzUSDhyYBgXY0IvBUkA1uTH0-bSJpzEcXuiMcAKMtWXekQUBfnp8eLDgP0kIfrc8L4KrQ/exec",
+  "start_url": "https://script.google.com/macros/s/AKfycbzUSDhyYBgXY0IvBUkA1uTH0-bSJpzEcXuiMcAKMtWXekQUBfnp8eLDgP0kIfrc8L4KrQ/exec",
+  "icons": [
+      {
+          "src": "https://raw.githubusercontent.com/mina-alabd/bazza/refs/heads/main/logo.png",
+          "sizes": "any",
+          "type": "image/png",
+          "purpose": "any"
+      }
+  ]
+}
+
+  
